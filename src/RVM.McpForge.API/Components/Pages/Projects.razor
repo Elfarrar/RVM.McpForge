@@ -1,0 +1,139 @@
+@page "/projects"
+@using RVM.McpForge.Domain.Entities
+@using RVM.McpForge.Domain.Enums
+@using RVM.McpForge.Domain.Interfaces
+@inject IForgeProjectRepository ProjectRepo
+
+<PageTitle>Projects - RVM.McpForge</PageTitle>
+
+<h2>Forge Projects</h2>
+
+<div class="toolbar">
+    <button class="btn btn-primary" @onclick="ShowCreateForm">+ New Project</button>
+</div>
+
+@if (_showForm)
+{
+    <div class="form-card">
+        <h3>@(_editing ? "Edit Project" : "New Project")</h3>
+        <div class="form-group">
+            <label>Name</label>
+            <input class="form-input" @bind="_model.Name" />
+        </div>
+        <div class="form-group">
+            <label>Source Type</label>
+            <select class="form-input" @bind="_model.SourceType">
+                <option value="@SourceType.Git">Git Repository</option>
+                <option value="@SourceType.Database">Database</option>
+            </select>
+        </div>
+        @if (_model.SourceType == SourceType.Git)
+        {
+            <div class="form-group">
+                <label>Git Repository URL (public)</label>
+                <input class="form-input" @bind="_model.RepositoryUrl" placeholder="https://github.com/user/repo.git" />
+            </div>
+            <div class="form-group">
+                <label>Or Local Path</label>
+                <input class="form-input" @bind="_model.RepositoryPath" placeholder="C:\path\to\repo" />
+            </div>
+            <div class="form-group">
+                <label>Solution File (optional)</label>
+                <input class="form-input" @bind="_model.SolutionFile" />
+            </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <label>Connection String</label>
+                <input class="form-input" @bind="_model.ConnectionString" />
+            </div>
+            <div class="form-group">
+                <label>Database Name</label>
+                <input class="form-input" @bind="_model.DatabaseName" />
+            </div>
+        }
+        <div class="form-group">
+            <label>Description</label>
+            <input class="form-input" @bind="_model.Description" />
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-primary" @onclick="SaveProject">Save</button>
+            <button class="btn btn-secondary" @onclick="CancelForm">Cancel</button>
+        </div>
+    </div>
+}
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Source</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th>Last Analyzed</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var project in _projects)
+        {
+            <tr>
+                <td>@project.Name</td>
+                <td><span class="badge">@project.SourceType</span></td>
+                <td><span class="badge badge-@project.Status.ToString().ToLower()">@project.Status</span></td>
+                <td>@project.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@(project.LastAnalyzedAt?.ToString("yyyy-MM-dd HH:mm") ?? "—")</td>
+                <td>
+                    <button class="btn btn-sm" @onclick="() => DeleteProject(project.Id)">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private IReadOnlyList<ForgeProject> _projects = [];
+    private ForgeProject _model = new();
+    private bool _showForm;
+    private bool _editing;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProjects();
+    }
+
+    private async Task LoadProjects()
+    {
+        _projects = await ProjectRepo.GetAllAsync();
+    }
+
+    private void ShowCreateForm()
+    {
+        _model = new ForgeProject();
+        _showForm = true;
+        _editing = false;
+    }
+
+    private void CancelForm()
+    {
+        _showForm = false;
+    }
+
+    private async Task SaveProject()
+    {
+        if (_editing)
+            await ProjectRepo.UpdateAsync(_model);
+        else
+            await ProjectRepo.AddAsync(_model);
+
+        _showForm = false;
+        await LoadProjects();
+    }
+
+    private async Task DeleteProject(Guid id)
+    {
+        await ProjectRepo.DeleteAsync(id);
+        await LoadProjects();
+    }
+}

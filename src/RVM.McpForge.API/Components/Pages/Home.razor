@@ -1,0 +1,36 @@
+@page "/"
+@using RVM.McpForge.Domain.Interfaces
+@inject IForgeProjectRepository ProjectRepo
+
+<PageTitle>Dashboard - RVM.McpForge</PageTitle>
+
+<h1>Dashboard</h1>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <span class="stat-value">@_projectCount</span>
+        <span class="stat-label">Projects</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value">@_analyzedCount</span>
+        <span class="stat-label">Analyzed</span>
+    </div>
+    <div class="stat-card">
+        <span class="stat-value">@_readyCount</span>
+        <span class="stat-label">Ready</span>
+    </div>
+</div>
+
+@code {
+    private int _projectCount;
+    private int _analyzedCount;
+    private int _readyCount;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var projects = await ProjectRepo.GetAllAsync();
+        _projectCount = projects.Count;
+        _analyzedCount = projects.Count(p => p.Status == Domain.Enums.ForgeStatus.Analyzed);
+        _readyCount = projects.Count(p => p.Status == Domain.Enums.ForgeStatus.Ready);
+    }
+}

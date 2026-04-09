@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/RVM.McpForge.Domain/RVM.McpForge.Domain.csproj" />
+    <Project Path="src/RVM.McpForge.Infrastructure/RVM.McpForge.Infrastructure.csproj" />
+    <Project Path="src/RVM.McpForge.Application/RVM.McpForge.Application.csproj" />
+    <Project Path="src/RVM.McpForge.API/RVM.McpForge.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/RVM.McpForge.Tests/RVM.McpForge.Tests.csproj" />
+  </Folder>
+</Solution>

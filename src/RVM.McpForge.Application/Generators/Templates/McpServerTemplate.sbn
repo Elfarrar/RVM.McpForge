@@ -1,0 +1,18 @@
+using ModelContextProtocol.Server;
+using System.ComponentModel;
+
+namespace {{ server_name }}.Tools;
+
+{{~ for tool in tools ~}}
+[McpServerToolType]
+public static class {{ tool.class_name }}
+{
+    [McpServerTool, Description("{{ tool.description }}")]
+    public static string {{ tool.method_name }}({{ tool.parameters }})
+    {
+        // TODO: Implement {{ tool.name }}
+        return System.Text.Json.JsonSerializer.Serialize(new { message = "{{ tool.name }} executed" });
+    }
+}
+
+{{~ end ~}}

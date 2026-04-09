@@ -1,0 +1,24 @@
+services:
+  api:
+    container_name: rvmmcpforge-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5120:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Host=rvmtech-db;Database=rvmmcpforge;Username=rvmtech;Password=${POSTGRES_PASSWORD}
+      - DataProtection__Directory=/app/data/dataprotection
+    volumes:
+      - mcpforge-data:/app/data
+    networks:
+      - rvmtech-network
+    restart: unless-stopped
+
+volumes:
+  mcpforge-data:
+
+networks:
+  rvmtech-network:
+    external: true

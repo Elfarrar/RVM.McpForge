@@ -1,0 +1,54 @@
+@page "/generated"
+@using RVM.McpForge.Domain.Entities
+@using RVM.McpForge.Domain.Interfaces
+@inject IForgeProjectRepository ProjectRepo
+@inject IGeneratedMcpProjectRepository GeneratedRepo
+
+<PageTitle>Generated Servers - RVM.McpForge</PageTitle>
+
+<h2>Generated MCP Servers</h2>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>Server Name</th>
+            <th>Project</th>
+            <th>Tools</th>
+            <th>Resources</th>
+            <th>Generated At</th>
+            <th>Output Path</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var gen in _generated)
+        {
+            <tr>
+                <td>@gen.McpServerName</td>
+                <td>@(_projectNames.GetValueOrDefault(gen.ForgeProjectId, "—"))</td>
+                <td>@gen.ToolCount</td>
+                <td>@gen.ResourceCount</td>
+                <td>@gen.GeneratedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                <td><code>@gen.OutputPath</code></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<GeneratedMcpProject> _generated = [];
+    private Dictionary<Guid, string> _projectNames = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var projects = await ProjectRepo.GetAllAsync();
+        _projectNames = projects.ToDictionary(p => p.Id, p => p.Name);
+
+        foreach (var project in projects)
+        {
+            var gens = await GeneratedRepo.GetByProjectIdAsync(project.Id);
+            _generated.AddRange(gens);
+        }
+
+        _generated = _generated.OrderByDescending(g => g.GeneratedAt).ToList();
+    }
+}
