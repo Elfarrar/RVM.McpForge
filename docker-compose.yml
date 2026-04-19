@@ -10,6 +10,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=Host=rvmtech-db;Database=rvmmcpforge;Username=rvmtech;Password=${POSTGRES_PASSWORD}
       - DataProtection__Directory=/app/data/dataprotection
+      - Seq__ServerUrl=http://187.77.48.215:5341
     volumes:
       - mcpforge-data:/app/data
     networks:
