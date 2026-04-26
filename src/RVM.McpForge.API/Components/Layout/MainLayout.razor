@@ -1,7 +1,9 @@
 @inherits LayoutComponentBase
 
+<a class="skip-nav" href="#main-content">Pular para o conteúdo</a>
+
 <div class="app-layout">
-    <nav class="sidebar">
+    <nav class="sidebar" aria-label="Menu principal">
         <div class="sidebar-header">
             <h2>RVM.McpForge</h2>
             <span class="subtitle">MCP Server Generator</span>
@@ -12,7 +14,7 @@
             <li><NavLink href="generated">Generated Servers</NavLink></li>
         </ul>
     </nav>
-    <main class="main-content">
+    <main id="main-content" class="main-content" role="main">
         <div class="page-body">
             @Body
         </div>
